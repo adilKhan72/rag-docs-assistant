@@ -1,0 +1,25 @@
+name: rag-docs-assistant
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: rag
+      POSTGRES_USER: rag
+      POSTGRES_PASSWORD: rag
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rag"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://rag:rag@postgres:5432/rag
+    ports: ["8080:8080"]
+    depends_on:
+      postgres: { condition: service_healthy }
+
+volumes:
+  pgdata:
