@@ -98,6 +98,23 @@ python -m evals.retrieval_eval --check     # needs DATABASE_URL; ingests corpus/
 
 The prompt treats documents as untrusted input (prompt-injection guard).
 
+## MCP server
+
+The knowledge base is available to any MCP client (Claude Code, Claude Desktop, IDEs) as two tools with typed
+input **and output** schemas:
+
+| Tool | Returns |
+|---|---|
+| `search_docs(query, top_k=5)` | passages: `source`, `heading`, `content`, `similarity`, `chunk_id` |
+| `ask(question)` | `answer`, `abstained`, `reason`, `citations[]`, `sources[]`, using the same verified-citation pipeline as `POST /ask` |
+
+```bash
+# Claude Code (stdio transport; the server reads DATABASE_URL and LLM_PROVIDER from the environment)
+claude mcp add ragdocs --env DATABASE_URL=postgresql://rag:rag@localhost:5432/rag -- python -m ragdocs.mcp_server
+```
+
+Built on the MCP Python SDK 2.x (`MCPServer`). Tests call the tools through the server's own `list_tools`/`call_tool`.
+
 ## Roadmap
 
 | # | Milestone | Status |
@@ -105,7 +122,7 @@ The prompt treats documents as untrusted input (prompt-injection guard).
 | 1 | Ingestion: heading-aware chunking, local embeddings, pgvector schema, `POST /ingest`, CLI | ✅ done (#1) |
 | 2 | Hybrid retrieval (vector + full-text + RRF), `POST /search`, retrieval eval gating CI | ✅ done (#2) |
 | 3 | Cited answers: providers, two-stage abstain, citation verification, `POST /ask` | ✅ done (#3) |
-| 4 | MCP server (`search_docs`, `ask`) | planned |
+| 4 | MCP server (`search_docs`, `ask`) with typed outputs | ✅ done (#4) |
 | 5 | Answer evals (LLM-judged faithfulness and relevance), report | planned |
 
 ## Licence
