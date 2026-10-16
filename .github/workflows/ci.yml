@@ -28,6 +28,14 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
       - run: python -m pytest -q
+      - name: Cache embedding model
+        uses: actions/cache@v4
+        with:
+          path: /tmp/fastembed_cache
+          key: fastembed-bge-small-en-v1.5
+      # ADR-0004: retrieval quality is a build gate, measured with the real local embedding model.
+      - name: Retrieval eval (gate)
+        run: python -m evals.retrieval_eval --check
 
   docker:
     runs-on: ubuntu-latest

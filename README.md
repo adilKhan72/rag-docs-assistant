@@ -56,12 +56,38 @@ make up && make ingest        # PostgreSQL + API, then index corpus/ (a sample e
 make test                     # unit + integration tests against pgvector
 ```
 
+## Retrieval and evals
+
+`POST /search {"query": "...", "top_k": 5, "mode": "hybrid|vector|keyword"}` returns chunks with their source,
+heading breadcrumb, fused score and **each retriever's rank** (so you can see why a chunk ranked where it did).
+Vector and keyword candidates (20 each) come from one PostgreSQL round-trip each and are fused with RRF (`k = 60`).
+
+The **retrieval eval** runs in CI with the real model (`bge-small-en-v1.5`) on 35 labelled questions over `corpus/`.
+Many questions are paraphrased away from the document wording ("how long can I stay home sick without a doctor's note?").
+A hit counts only if it comes from the right document **and** the right section.
+
+| mode | recall@5 | MRR | misses |
+|---|---|---|---|
+| vector | 0.971 | 0.911 | q04 |
+| keyword | 0.943 | 0.830 | q15, q19 |
+| **hybrid (RRF)** | **0.971** | 0.887 | q19 |
+
+**Honest reading:** on this small, clean corpus, dense retrieval alone is already strong. Hybrid matches its recall
+but has a slightly *lower* MRR, because keyword ranks occasionally pull a relevant chunk down one place. Hybrid stays
+the default because it rescues exact-token queries (codes, numbers, acronyms) that dense search misses on larger
+corpora (q04 is rescued here). The CI gate fails below recall@5 0.94 / MRR 0.85, set just under the measured baseline.
+Tuning RRF weights against this set without a held-out split would overfit, so that waits for a larger golden set.
+
+```bash
+python -m evals.retrieval_eval --check     # needs DATABASE_URL; ingests corpus/ and prints the table
+```
+
 ## Roadmap
 
 | # | Milestone | Status |
 |---|---|---|
 | 1 | Ingestion: heading-aware chunking, local embeddings, pgvector schema, `POST /ingest`, CLI | ✅ done (#1) |
-| 2 | Hybrid retrieval (vector + full-text + RRF), `POST /search`, retrieval eval gating CI | planned |
+| 2 | Hybrid retrieval (vector + full-text + RRF), `POST /search`, retrieval eval gating CI | ✅ done (#2) |
 | 3 | Cited answers: providers, refusal on weak evidence, citation verification, `POST /ask` | planned |
 | 4 | MCP server (`search_docs`, `ask`) | planned |
 | 5 | Answer evals (LLM-judged faithfulness and relevance), report | planned |

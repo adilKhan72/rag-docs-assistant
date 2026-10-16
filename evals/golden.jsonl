@@ -1,0 +1,41 @@
+{"id": "q01", "question": "How long before an unacknowledged page escalates to the secondary?", "expected": {"source": "on-call.md", "section": "Paging policy"}}
+{"id": "q02", "question": "When does the engineering manager get paged?", "expected": {"source": "on-call.md", "section": "Paging policy"}}
+{"id": "q03", "question": "How much is the weekly on-call stipend?", "expected": {"source": "on-call.md", "section": "Compensation"}}
+{"id": "q04", "question": "I answered a page at 3am, what do I get for it?", "expected": {"source": "on-call.md", "section": "Compensation"}}
+{"id": "q05", "question": "What is the minimum number of engineers in an on-call rotation?", "expected": {"source": "on-call.md", "section": "Rotation size"}}
+{"id": "q06", "question": "What has to be included when handing over a shift?", "expected": {"source": "on-call.md", "section": "Shifts and handover"}}
+{"id": "q07", "question": "What counts as a SEV1?", "expected": {"source": "incident-response.md", "section": "Severity levels"}}
+{"id": "q08", "question": "How often must customer status updates be posted during a major outage?", "expected": {"source": "incident-response.md", "section": "Roles"}}
+{"id": "q09", "question": "Does the incident commander debug the problem?", "expected": {"source": "incident-response.md", "section": "Roles"}}
+{"id": "q10", "question": "How do I declare an incident?", "expected": {"source": "incident-response.md", "section": "Declaring an incident"}}
+{"id": "q11", "question": "What's the deadline for publishing a postmortem?", "expected": {"source": "incident-response.md", "section": "Postmortems"}}
+{"id": "q12", "question": "What percentage of traffic does a canary get and for how long?", "expected": {"source": "deployments.md", "section": "Canary"}}
+{"id": "q13", "question": "When is a canary rolled back automatically?", "expected": {"source": "deployments.md", "section": "Canary"}}
+{"id": "q14", "question": "Can we deploy over the Christmas holidays?", "expected": {"source": "deployments.md", "section": "Deployment freeze"}}
+{"id": "q15", "question": "How do I roll back a service?", "expected": {"source": "deployments.md", "section": "Rollback"}}
+{"id": "q16", "question": "How many approvals does a change to billing code need?", "expected": {"source": "code-review.md", "section": "Requirements"}}
+{"id": "q17", "question": "What is the maximum recommended size of a pull request?", "expected": {"source": "code-review.md", "section": "Size"}}
+{"id": "q18", "question": "How fast should reviewers respond?", "expected": {"source": "code-review.md", "section": "Turnaround"}}
+{"id": "q19", "question": "Someone pushed an API key to GitHub, what now?", "expected": {"source": "security.md", "section": "Secrets"}}
+{"id": "q20", "question": "How long can just-in-time production access last?", "expected": {"source": "security.md", "section": "Access"}}
+{"id": "q21", "question": "Deadline to patch a critical CVE?", "expected": {"source": "security.md", "section": "Dependencies"}}
+{"id": "q22", "question": "How many vacation days do employees get per year?", "expected": {"source": "leave-policy.md", "section": "Annual leave"}}
+{"id": "q23", "question": "How long can I stay home sick without a doctor's note?", "expected": {"source": "leave-policy.md", "section": "Sick leave"}}
+{"id": "q24", "question": "How many weeks of parental leave does a secondary caregiver get?", "expected": {"source": "leave-policy.md", "section": "Parental leave"}}
+{"id": "q25", "question": "What is the daily meal allowance on business trips?", "expected": {"source": "expenses.md", "section": "Limits"}}
+{"id": "q26", "question": "Can I expense a new office chair for home?", "expected": {"source": "expenses.md", "section": "Limits"}}
+{"id": "q27", "question": "Within how many days must expenses be submitted?", "expected": {"source": "expenses.md", "section": "Submitting"}}
+{"id": "q28", "question": "When do new hires join the on-call rotation?", "expected": {"source": "onboarding.md", "section": "30-60-90 plan"}}
+{"id": "q29", "question": "How long are old API versions supported after a new major version?", "expected": {"source": "api-guidelines.md", "section": "Versioning"}}
+{"id": "q30", "question": "How long are idempotency keys kept?", "expected": {"source": "api-guidelines.md", "section": "Idempotency"}}
+{"id": "q31", "question": "What is the default API rate limit?", "expected": {"source": "api-guidelines.md", "section": "Rate limits"}}
+{"id": "q32", "question": "How long are application logs kept in cold storage?", "expected": {"source": "data-retention.md", "section": "Logs"}}
+{"id": "q33", "question": "How often are restore drills run for backups?", "expected": {"source": "data-retention.md", "section": "Backups"}}
+{"id": "q34", "question": "What is the availability SLO of the public API?", "expected": {"source": "service-levels.md", "section": "Targets"}}
+{"id": "q35", "question": "What happens when half the error budget is used up?", "expected": {"source": "service-levels.md", "section": "Error budgets"}}
+{"id": "u01", "question": "What is the company's 401(k) matching percentage?", "expected": null}
+{"id": "u02", "question": "Which cloud provider do we use for production?", "expected": null}
+{"id": "u03", "question": "Who is the current VP of Engineering?", "expected": null}
+{"id": "u04", "question": "What is the dress code in the Lisbon office?", "expected": null}
+{"id": "u05", "question": "How do I reset my VPN password?", "expected": null}
+{"id": "u06", "question": "What is the bonus structure for engineers?", "expected": null}
