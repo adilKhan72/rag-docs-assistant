@@ -82,13 +82,29 @@ Tuning RRF weights against this set without a held-out split would overfit, so t
 python -m evals.retrieval_eval --check     # needs DATABASE_URL; ingests corpus/ and prints the table
 ```
 
+## Answers with verified citations
+
+`POST /ask {"question": "..."}` → `{answer, abstained, reason, citations: [{n, chunk_id, source, heading}], sources}`
+
+1. Retrieve the top 5 passages (hybrid).
+2. **Stage 1 abstain:** if the best cosine similarity is below 0.62 (calibrated on the golden set, see ADR-0003),
+   answer "I couldn't find this" **without calling the model**, and list the closest sources.
+3. Otherwise the model (Claude by default, OpenAI, Ollama, or fixtures) returns structured output
+   `{answerable, answer, citations}`, with inline `[n]` markers.
+4. **Verification:** citations must point at retrieved passages, inline markers must match the declared citations,
+   and an answerable reply must cite something. A failing reply gets one corrective retry with the exact problems, then
+   abstains (`unverifiable_citations`).
+5. **Stage 2 abstain:** the model may say the passages don't contain the answer (`not_in_context`).
+
+The prompt treats documents as untrusted input (prompt-injection guard).
+
 ## Roadmap
 
 | # | Milestone | Status |
 |---|---|---|
 | 1 | Ingestion: heading-aware chunking, local embeddings, pgvector schema, `POST /ingest`, CLI | ✅ done (#1) |
 | 2 | Hybrid retrieval (vector + full-text + RRF), `POST /search`, retrieval eval gating CI | ✅ done (#2) |
-| 3 | Cited answers: providers, refusal on weak evidence, citation verification, `POST /ask` | planned |
+| 3 | Cited answers: providers, two-stage abstain, citation verification, `POST /ask` | ✅ done (#3) |
 | 4 | MCP server (`search_docs`, `ask`) | planned |
 | 5 | Answer evals (LLM-judged faithfulness and relevance), report | planned |
 

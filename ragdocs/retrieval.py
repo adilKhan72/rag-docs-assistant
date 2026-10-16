@@ -20,10 +20,12 @@ class Hit:
     content: str
     score: float
     ranks: dict[str, int] = field(default_factory=dict)  # retriever → 1-based rank, for explainability
+    # Cosine similarity to the query (None in keyword-only mode). Unlike the RRF score, it's an absolute
+    # relevance signal, so it's what the abstain decision uses (ADR-0003).
+    similarity: float | None = None
 
 
-def _vector_ranked(conn: psycopg.Connection, embedder: Embedder, query: str, limit: int) -> list[int]:
-    vector = embedder.embed_query(query)
+def _vector_ranked(conn: psycopg.Connection, embedder: Embedder, vector: list[float], limit: int) -> list[int]:
     rows = conn.execute(
         # Only chunks embedded with the same model are comparable (ADR-0002).
         "SELECT id FROM chunks WHERE embedding_model = %s ORDER BY embedding <=> %s::vector LIMIT %s",
@@ -65,8 +67,9 @@ def reciprocal_rank_fusion(rankings: dict[str, list[int]], k: int = RRF_K) -> li
 
 def search(conn: psycopg.Connection, embedder: Embedder, query: str, top_k: int = 5, mode: Mode = "hybrid") -> list[Hit]:
     rankings: dict[str, list[int]] = {}
-    if mode in ("hybrid", "vector"):
-        rankings["vector"] = _vector_ranked(conn, embedder, query, CANDIDATES)
+    vector = embedder.embed_query(query) if mode in ("hybrid", "vector") else None
+    if vector is not None:
+        rankings["vector"] = _vector_ranked(conn, embedder, vector, CANDIDATES)
     if mode in ("hybrid", "keyword"):
         rankings["keyword"] = _keyword_ranked(conn, query, CANDIDATES)
 
@@ -75,12 +78,17 @@ def search(conn: psycopg.Connection, embedder: Embedder, query: str, top_k: int 
         return []
 
     rows = conn.execute(
-        "SELECT c.id, d.source, d.title, c.heading, c.content FROM chunks c JOIN documents d ON d.id = c.document_id "
-        "WHERE c.id = ANY(%s)",
-        ([cid for cid, _, _ in fused],),
+        "SELECT c.id, d.source, d.title, c.heading, c.content, "
+        "CASE WHEN %s::vector IS NULL THEN NULL ELSE 1 - (c.embedding <=> %s::vector) END "
+        "FROM chunks c JOIN documents d ON d.id = c.document_id WHERE c.id = ANY(%s)",
+        (vector, vector, [cid for cid, _, _ in fused]),
     ).fetchall()
     by_id = {r[0]: r for r in rows}
     return [
-        Hit(chunk_id=cid, source=by_id[cid][1], title=by_id[cid][2], heading=by_id[cid][3], content=by_id[cid][4], score=round(score, 6), ranks=ranks)
+        Hit(
+            chunk_id=cid, source=by_id[cid][1], title=by_id[cid][2], heading=by_id[cid][3], content=by_id[cid][4],
+            score=round(score, 6), ranks=ranks,
+            similarity=None if by_id[cid][5] is None else round(float(by_id[cid][5]), 4),
+        )
         for cid, score, ranks in fused
     ]
