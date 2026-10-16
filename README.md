@@ -82,6 +82,16 @@ Tuning RRF weights against this set without a held-out split would overfit, so t
 python -m evals.retrieval_eval --check     # needs DATABASE_URL; ingests corpus/ and prints the table
 ```
 
+The **answer eval** (opt-in, needs a real model) runs every golden question through the full `/ask` pipeline and reports
+**coverage** (answered rate on answerable questions), **faithfulness** and **correctness** (LLM-as-judge, judged only
+against the passages the answer cited), whether the cited passage was the right section, and **abstention accuracy**
+on the unanswerable questions. Reports go to `evals/reports/`. It isn't a CI gate because it costs money and varies
+between runs. **No live report exists yet:** no API key was available while building this, and the harness is unit-tested.
+
+```bash
+LLM_PROVIDER=anthropic ANTHROPIC_API_KEY=... python -m evals.answer_eval
+```
+
 ## Answers with verified citations
 
 `POST /ask {"question": "..."}` → `{answer, abstained, reason, citations: [{n, chunk_id, source, heading}], sources}`
@@ -123,7 +133,7 @@ Built on the MCP Python SDK 2.x (`MCPServer`). Tests call the tools through the 
 | 2 | Hybrid retrieval (vector + full-text + RRF), `POST /search`, retrieval eval gating CI | ✅ done (#2) |
 | 3 | Cited answers: providers, two-stage abstain, citation verification, `POST /ask` | ✅ done (#3) |
 | 4 | MCP server (`search_docs`, `ask`) with typed outputs | ✅ done (#4) |
-| 5 | Answer evals (LLM-judged faithfulness and relevance), report | planned |
+| 5 | Answer eval harness: LLM-judged faithfulness/correctness, coverage, abstention accuracy, reports | ✅ done (#5) (no live run yet) |
 
 ## Licence
 
