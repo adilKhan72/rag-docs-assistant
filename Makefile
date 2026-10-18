@@ -16,5 +16,5 @@ test:
 	docker run -d --rm --name rag-test-pg --network rag-test -e POSTGRES_USER=rag -e POSTGRES_PASSWORD=rag -e POSTGRES_DB=rag pgvector/pgvector:pg17 >/dev/null
 	sleep 5
 	docker run --rm --network rag-test -e PYTHONDONTWRITEBYTECODE=1 -e DATABASE_URL=postgresql://rag:rag@rag-test-pg:5432/rag \
-		-v "$$PWD":/app -w /app python:3.12-slim sh -c 'pip install -q -r requirements.txt && python -m pytest -q -p no:cacheprovider'; \
+		-v "$$PWD":/app -w /app python:3.14-slim sh -c 'pip install -q -r requirements.txt && python -m pytest -q -p no:cacheprovider'; \
 		status=$$?; docker stop rag-test-pg >/dev/null; exit $$status
